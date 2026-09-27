@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Calculator</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;800&family=Space+Grotesk:wght@500;700&display=swap"
+    />
+    <style>
+      :root {
+        --calc-pink: #ff4ecd;
+        --calc-violet: #8b5cf6;
+        --calc-cyan: #22d3ee;
+        --calc-glass: rgba(255, 255, 255, 0.07);
+        --calc-glass-border: rgba(255, 255, 255, 0.16);
+      }
+
+      body {
+        min-height: 100vh;
+        font-family: 'Space Grotesk', system-ui, sans-serif;
+        background: #0b0620;
+        overflow-x: hidden;
+      }
+
+      /* Three blurred blobs of colour drifting behind the glass. */
+      .backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        overflow: hidden;
+      }
+
+      .backdrop span {
+        position: absolute;
+        width: 42vmax;
+        height: 42vmax;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.55;
+        animation: drift 18s ease-in-out infinite alternate;
+      }
+
+      .backdrop span:nth-child(1) {
+        background: var(--calc-violet);
+        top: -12vmax;
+        left: -8vmax;
+      }
+
+      .backdrop span:nth-child(2) {
+        background: var(--calc-pink);
+        bottom: -16vmax;
+        right: -10vmax;
+        animation-delay: -6s;
+      }
+
+      .backdrop span:nth-child(3) {
+        background: var(--calc-cyan);
+        top: 40%;
+        left: 45%;
+        width: 26vmax;
+        height: 26vmax;
+        opacity: 0.35;
+        animation-delay: -12s;
+      }
+
+      @keyframes drift {
+        to {
+          transform: translate(6vmax, 4vmax) scale(1.15);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .backdrop span {
+          animation: none;
+        }
+      }
+
+      .calculator {
+        max-width: 40rem;
+        width: calc(100% - 2rem);
+        background: var(--calc-glass);
+        border: 1px solid var(--calc-glass-border);
+        border-radius: 2rem;
+        backdrop-filter: blur(24px) saturate(160%);
+        -webkit-backdrop-filter: blur(24px) saturate(160%);
+        box-shadow:
+          0 30px 80px rgba(0, 0, 0, 0.45),
+          inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      }
+
+      .calculator h1 {
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        background: linear-gradient(90deg, var(--calc-cyan), var(--calc-violet), var(--calc-pink));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .logo {
+        flex: none;
+        width: 3.25rem;
+        height: 3.25rem;
+        border-radius: 1rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #fff;
+        background: linear-gradient(135deg, var(--calc-violet), var(--calc-pink));
+        box-shadow: 0 8px 24px rgba(255, 78, 205, 0.45);
+      }
+
+      .operation {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr auto 1.2fr;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        border-radius: 1.5rem;
+        background: rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .operation input {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.75rem;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 1rem;
+        min-width: 0;
+      }
+
+      .operation input:focus {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--calc-cyan);
+        box-shadow: 0 0 0 0.25rem rgba(34, 211, 238, 0.25);
+      }
+
+      .operator {
+        display: grid;
+        place-items: center;
+        width: 2.75rem;
+        height: 2.75rem;
+        border-radius: 50%;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #fff;
+        background: linear-gradient(135deg, var(--calc-violet), var(--calc-pink));
+      }
+
+      .equals {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.75rem;
+        color: rgba(255, 255, 255, 0.75);
+      }
+
+      .result {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 2.25rem;
+        font-weight: 800;
+        text-align: center;
+        padding: 0.35rem 0.75rem;
+        border-radius: 1rem;
+        color: #fff;
+        background: linear-gradient(135deg, rgba(34, 211, 238, 0.25), rgba(139, 92, 246, 0.25));
+        text-shadow: 0 0 18px rgba(34, 211, 238, 0.9);
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      @media (max-width: 480px) {
+        .operation {
+          grid-template-columns: 1fr auto 1fr;
+        }
+
+        .equals {
+          display: none;
+        }
+
+        .result {
+          grid-column: 1 / -1;
+        }
+      }
+    </style>
+  </head>
+  <body class="d-flex align-items-center py-5">
+    <div class="backdrop" aria-hidden="true"><span></span><span></span><span></span></div>
+
+    <main class="calculator container p-4 p-sm-5">
+      <header class="d-flex align-items-center gap-3 mb-4">
+        <div class="logo d-flex align-items-center justify-content-center" aria-hidden="true">±</div>
+        <div>
+          <h1 class="h2 mb-0">Calculator</h1>
+          <p class="text-body-secondary mb-0">Two operations. What could go wrong?</p>
+        </div>
+      </header>
+
+      <!-- Addition -->
+      <div id="addition" class="operation mb-3">
+        <input type="number" class="form-control a" value="3" aria-label="First number" />
+        <span class="operator">+</span>
+        <input type="number" class="form-control b" value="5" aria-label="Second number" />
+        <span class="equals">=</span>
+        <output class="result"></output>
+      </div>
+
+      <!-- Subtraction -->
+      <div id="subtraction" class="operation">
+        <input type="number" class="form-control a" value="17" aria-label="First number" />
+        <span class="operator">−</span>
+        <input type="number" class="form-control b" value="9" aria-label="Second number" />
+        <span class="equals">=</span>
+        <output class="result"></output>
+      </div>
+    </main>
+
+    <script src="calculations.js"></script>
+    <script src="addition.js"></script>
+    <script src="subtraction.js"></script>
+  </body>
+</html>
